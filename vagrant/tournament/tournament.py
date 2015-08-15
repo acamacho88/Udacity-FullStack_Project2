@@ -75,6 +75,11 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    conn = connect()
+    curs = conn.cursor()
+    curs.execute("INSERT INTO matches (winner, loser) VALUES (%s,%s)" , (winner,loser))
+    conn.commit()
+    conn.close()
  
  
 def swissPairings():
@@ -93,11 +98,4 @@ def swissPairings():
         name2: the second player's name
     """
 
-
-registerPlayer('john')
-registerPlayer('mark')
-registerPlayer('kevin')
-registerPlayer('jim')
-print countPlayers()
-deletePlayers()
-print countPlayers()
+reportMatch(2,4);
