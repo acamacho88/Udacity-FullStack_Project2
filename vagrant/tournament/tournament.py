@@ -18,10 +18,22 @@ def deleteMatches():
 
 def deletePlayers():
     """Remove all the player records from the database."""
+    conn = connect()
+    curs = conn.cursor()
+    curs.execute("DELETE FROM players;")
+    conn.commit()
+    conn.close()
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    conn = connect()
+    curs = conn.cursor()
+    curs.execute("SELECT COUNT(*) FROM players;")
+    record = curs.fetchall()[0]
+    number = str(record[0])
+    conn.close()
+    return number
 
 
 def registerPlayer(name):
@@ -82,3 +94,10 @@ def swissPairings():
     """
 
 
+registerPlayer('john')
+registerPlayer('mark')
+registerPlayer('kevin')
+registerPlayer('jim')
+print countPlayers()
+deletePlayers()
+print countPlayers()
