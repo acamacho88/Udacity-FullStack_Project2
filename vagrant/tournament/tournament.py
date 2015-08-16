@@ -14,6 +14,11 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
+    conn = connect()
+    curs = conn.cursor()
+    curs.execute("DELETE FROM matches;")
+    conn.commit()
+    conn.close()
 
 
 def deletePlayers():
@@ -66,7 +71,15 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-
+    conn = connect()
+    curs = conn.cursor()
+    curs.execute("SELECT tot_matches.id, name, wins, total FROM wins " +
+                 "INNER JOIN tot_matches ON tot_matches.id = wins.id " +
+                 "INNER JOIN players ON tot_matches.id = players.id;")
+    standings = ({'id': str(row[0]), 'name': str(row[1]), 'wins': str(row[2]),
+                  'total': str(row[3])} for row in curs.fetchall())
+    conn.close()
+    return standings
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
@@ -98,4 +111,6 @@ def swissPairings():
         name2: the second player's name
     """
 
-reportMatch(2,4);
+record = playerStandings()
+for line in record:
+    print line
