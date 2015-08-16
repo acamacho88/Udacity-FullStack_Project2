@@ -75,9 +75,10 @@ def playerStandings():
     curs = conn.cursor()
     curs.execute("SELECT tot_matches.id, name, wins, total FROM wins " +
                  "INNER JOIN tot_matches ON tot_matches.id = wins.id " +
-                 "INNER JOIN players ON tot_matches.id = players.id;")
-    standings = ({'id': str(row[0]), 'name': str(row[1]), 'wins': str(row[2]),
-                  'total': str(row[3])} for row in curs.fetchall())
+                 "INNER JOIN players ON tot_matches.id = players.id " +
+                 "ORDER BY wins DESC;")
+    standings = ((int(row[0]), str(row[1]), int(row[2]), int(row[3]))
+                 for row in curs.fetchall())
     conn.close()
     return standings
 
@@ -110,7 +111,15 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-
-record = playerStandings()
-for line in record:
-    print line
+    standings = playerStandings()
+    pairings = ()
+    for line in standings:
+        curr_id = line[0]
+        curr_wins = line[2]
+        for line in standings:
+            if curr_id != line[0] and curr_wins == line[2]:
+                match_id = line[0]
+                match_name = line[1]
+                break
+        pairings += (line[0],line[1],match_id,match_name)
+    return pairings
