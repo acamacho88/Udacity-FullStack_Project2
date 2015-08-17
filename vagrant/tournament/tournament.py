@@ -16,6 +16,8 @@ def deleteMatches():
     """Remove all the match records from the database."""
     conn = connect()
     curs = conn.cursor()
+    # Camacho - No criteria needed for delete statement since everything
+    # is being removed
     curs.execute("DELETE FROM matches;")
     conn.commit()
     conn.close()
@@ -25,6 +27,8 @@ def deletePlayers():
     """Remove all the player records from the database."""
     conn = connect()
     curs = conn.cursor()
+    # Camacho - No criteria needed for delete statement since everything
+    # is being removed
     curs.execute("DELETE FROM players;")
     conn.commit()
     conn.close()
@@ -52,6 +56,7 @@ def registerPlayer(name):
     """
     conn = connect()
     curs = conn.cursor()
+    # Camacho - sanitized the input since this is a text field
     cleaned = bleach.clean(name)
     curs.execute("INSERT INTO players (name) VALUES (%s)" , (cleaned,))
     conn.commit()
@@ -73,10 +78,14 @@ def playerStandings():
     """
     conn = connect()
     curs = conn.cursor()
+    # Camacho - needed to incorporate the wins and tot_matches views to get
+    # the total number of wins and matches for each player
     curs.execute("SELECT tot_matches.id, name, wins, total FROM wins " +
                  "INNER JOIN tot_matches ON tot_matches.id = wins.id " +
                  "INNER JOIN players ON tot_matches.id = players.id " +
                  "ORDER BY wins DESC;")
+    # Camacho - altered the dictionary comprehension in the forum exercise
+    # to be a list comprehension
     standings = [(int(row[0]), str(row[1]), int(row[2]), int(row[3]))
                  for row in curs.fetchall()]
     conn.close()
@@ -91,6 +100,7 @@ def reportMatch(winner, loser):
     """
     conn = connect()
     curs = conn.cursor()
+    # Camacho - no need to sanitize the input since they're integer values
     curs.execute("INSERT INTO matches (winner, loser) VALUES (%s,%s)" , (winner,loser))
     conn.commit()
     conn.close()
@@ -112,9 +122,14 @@ def swissPairings():
         name2: the second player's name
     """
     standings = playerStandings()
+    # Camacho - create the empty list
     pairings = []
     numplayers = countPlayers()
+    # Camacho - only run this loop once for every pair of players (numplayers/2)
     for a in range(numplayers/2):
+        # Camacho - made sure the players were put in the list in pairs in the order
+        # they were given in the playerStandings() method since they were already
+        # in the order of their number of wins
         pairings.append((standings[a*2][0],standings[a*2][1],standings[a*2+1][0],
                          standings[a*2+1][1]))
     return pairings
