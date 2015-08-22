@@ -30,6 +30,9 @@ CREATE VIEW losses as SELECT id, COUNT(loser) losses FROM matches
 RIGHT JOIN players ON loser = id
 GROUP BY id;
 
+-- Camacho: This could have counted the winner or loser column since
+-- either would present a 0 if the player had not played any matches
+
 CREATE VIEW tot_matches as SELECT id, COUNT(winner) total FROM matches
 RIGHT JOIN players ON id = winner OR id = loser
 GROUP BY id;
